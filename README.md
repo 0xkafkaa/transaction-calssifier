@@ -4,5 +4,5 @@ Upload an Paytm payments(XLSV) to classify transactions using Google Gemini AI. 
 
 # Demo
 
-![Demo Image](public/images/demo1.png)
-![Demo Image](public/images/demo2.png)
+![Demo Image](public/demo1.png)
+![Demo Image](public/demo2.png)
