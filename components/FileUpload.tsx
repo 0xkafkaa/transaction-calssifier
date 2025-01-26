@@ -20,6 +20,7 @@ export function FileUpload() {
   const [file, setFile] = useState<File | null>(null);
   const [response, setResponse] = useState<any>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [apiKey, setApiKey] = useState<string>("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -28,8 +29,37 @@ export function FileUpload() {
     }
   };
 
+  // const handleUpload = async () => {
+  //   if (file) {
+  //     setIsUploading(true);
+  //     setResponse(null);
+
+  //     const formData = new FormData();
+  //     formData.append("file", file);
+
+  //     try {
+  //       // Replace with your API endpoint
+  //       const response = await fetch("/api/upload", {
+  //         method: "POST",
+  //         body: formData,
+  //       });
+
+  //       const data = await response.json(); // Parse the JSON response
+
+  //       if (response.ok) {
+  //         setResponse(data);
+  //       } else {
+  //         setResponse({ error: "Error uploading file." });
+  //       }
+  //     } catch (error) {
+  //       setResponse({ error: "An unexpected error occurred." });
+  //     } finally {
+  //       setIsUploading(false);
+  //     }
+  //   }
+  // };
   const handleUpload = async () => {
-    if (file) {
+    if (file && apiKey) {
       setIsUploading(true);
       setResponse(null);
 
@@ -37,13 +67,15 @@ export function FileUpload() {
       formData.append("file", file);
 
       try {
-        // Replace with your API endpoint
         const response = await fetch("/api/upload", {
           method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`, // Include API key in headers
+          },
           body: formData,
         });
 
-        const data = await response.json(); // Parse the JSON response
+        const data = await response.json();
 
         if (response.ok) {
           setResponse(data);
@@ -71,7 +103,7 @@ export function FileUpload() {
 
   return (
     <div className="space-y-8">
-      {/* File Input and Upload Button */}
+      {/* File Input and Upload Button
       <div className="flex items-center gap-2">
         <Label htmlFor="file-upload" className="cursor-pointer">
           <Button asChild variant="outline">
@@ -94,6 +126,49 @@ export function FileUpload() {
             "Upload"
           )}
         </Button>
+      </div> */}
+      {/* File Input, API Key Input, and Upload Button */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          {/* API Key Input */}
+          <div className="flex items-center gap-2">
+            <Label htmlFor="api-key" className="whitespace-nowrap">
+              API Key:
+            </Label>
+            <Input
+              id="api-key"
+              type="text"
+              placeholder="Enter your API key"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className="flex-1"
+            />
+          </div>
+          <Label htmlFor="file-upload" className="cursor-pointer">
+            <Button asChild variant="outline">
+              <div className="flex items-center gap-2">
+                <Upload className="h-4 w-4" />
+                <span>Choose File</span>
+              </div>
+            </Button>
+            <Input
+              id="file-upload"
+              type="file"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </Label>
+          <Button
+            onClick={handleUpload}
+            disabled={!file || isUploading || !apiKey}
+          >
+            {isUploading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Upload"
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Selected File Name */}

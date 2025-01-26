@@ -2,13 +2,23 @@ import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { classificationPrompt } from "@/utils/prompt";
-// import { parsedResponse } from "@/utils/parsedResponse";
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI("api-key");
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function POST(request: Request) {
   try {
+    // Get the API key from the Authorization header
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { error: "Unauthorized: No API key provided" },
+        { status: 401 }
+      );
+    }
+    const apiKey = authHeader.split(" ")[1]; // Extract the API key from "Bearer <api-key>"
+
+    // Initialize Gemini AI with the API key from the headers
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
     // Parse the form data
     const data = await request.formData();
     const file: File | null = data.get("file") as File;
